@@ -21,7 +21,6 @@ export class VideoFacade {
         name: file.name,
         file,
       };
-
       return video;
     });
 

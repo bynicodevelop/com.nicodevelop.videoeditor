@@ -7,12 +7,7 @@ export const uploadVideos = createAction(
   props<{ videos: VideoEntity[] }>()
 );
 
-export const uploadVideosSuccess = createAction(
-  '[Video] Upload Videos Success',
-  props<{ videos: VideoEntity[] }>()
-);
-
-export const uploadVideosFailure = createAction(
-  '[Video] Upload Videos Failure',
-  props<{ error: any }>()
+export const updateVideo = createAction(
+  '[Video] Update Video',
+  props<{ video: VideoEntity }>()
 );

@@ -3,7 +3,7 @@ import { VideoEntity } from 'src/app/models/video';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { ActionReducer, createReducer, MetaReducer, on } from '@ngrx/store';
 
-import { uploadVideos } from './video.actions';
+import { updateVideo, uploadVideos } from './video.actions';
 
 const log = (reducer: ActionReducer<State>): ActionReducer<State> => {
   return (state, action): State => {
@@ -34,7 +34,12 @@ export const videoReducers = createReducer(
   on(
     uploadVideos,
     (state, { videos }): State => videoAdapter.addMany(videos, state)
-  )
+  ),
+  on(updateVideo, (state, { video }): State => {
+    console.log(video);
+    console.log(state);
+    return videoAdapter.updateOne({ id: video.name, changes: video }, state);
+  })
 );
 
 export const videoMetaReducers: MetaReducer[] = [log];

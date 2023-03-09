@@ -1,11 +1,13 @@
 import { isDevMode, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { VideoEffects } from './stores/videos/video.effects';
 import * as fromVideo from './stores/videos/video.reducers';
 
 @NgModule({
@@ -28,6 +30,8 @@ import * as fromVideo from './stores/videos/video.reducers';
     StoreModule.forFeature(fromVideo.videoFeatureKey, fromVideo.videoReducers, {
       metaReducers: [...fromVideo.videoMetaReducers],
     }),
+    EffectsModule.forRoot([VideoEffects]),
+    EffectsModule.forFeature([VideoEffects]),
     StoreDevtoolsModule.instrument({
       name: 'Video editor',
       logOnly: isDevMode(),
