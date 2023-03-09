@@ -12,10 +12,15 @@ import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 export class MainComponent implements OnInit {
   videos$: Observable<VideoEntity[]> = this.videoFacade.getVideos();
 
+  isReady: boolean = false;
+
   constructor(private videoFacade: VideoFacade) {}
 
   ngOnInit(): void {
-    this.videos$.subscribe((videos) => console.log(videos));
+    this.videos$.subscribe((videos): void => {
+      this.isReady =
+        videos.length > 0 && videos.every((video): boolean => !!video.audio);
+    });
   }
 
   onUploadFile(files: File[]): void {

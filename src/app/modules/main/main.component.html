@@ -1,1 +1,11 @@
-<app-dropzone (onUploadFile)="onUploadFile($event)"></app-dropzone>
+<div class="w-3/5 md:w-1/3 aspect-[9/16] m-auto pt-5">
+  <app-dropzone
+    *ngIf="!isReady"
+    (onUploadFile)="onUploadFile($event)"
+  ></app-dropzone>
+
+  <app-video-player
+    [videos]="videos$ | async"
+    *ngIf="isReady"
+  ></app-video-player>
+</div>

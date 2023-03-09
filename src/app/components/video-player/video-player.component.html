@@ -1,0 +1,4 @@
+<video
+  *ngFor="let video of videos"
+  [src]="video.file | safeurl"
+></video>

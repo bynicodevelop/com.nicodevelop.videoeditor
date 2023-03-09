@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
+import { uidFromFile } from 'src/app/core/lib/uid';
 import { VideoEntity } from 'src/app/models/video';
 
 import { Store } from '@ngrx/store';
@@ -18,7 +19,7 @@ export class VideoFacade {
   uploadVideos(files: File[]): void {
     const videos = files.map((file): VideoEntity => {
       const video: VideoEntity = {
-        name: file.name,
+        uid: uidFromFile(file),
         file,
       };
       return video;

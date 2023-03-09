@@ -24,7 +24,7 @@ export const videoFeatureKey = 'video';
 export interface State extends EntityState<VideoEntity> {}
 
 export const videoAdapter = createEntityAdapter<VideoEntity>({
-  selectId: (video: VideoEntity): string => video.name,
+  selectId: (video: VideoEntity): string => video.uid,
 });
 
 export const initialState: State = videoAdapter.getInitialState();
@@ -38,7 +38,7 @@ export const videoReducers = createReducer(
   on(updateVideo, (state, { video }): State => {
     console.log(video);
     console.log(state);
-    return videoAdapter.updateOne({ id: video.name, changes: video }, state);
+    return videoAdapter.updateOne({ id: video.uid, changes: video }, state);
   })
 );
 
