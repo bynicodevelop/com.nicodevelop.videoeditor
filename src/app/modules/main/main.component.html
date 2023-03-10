@@ -11,6 +11,17 @@
 </div>
 
 <div class="p-5">
+  <button
+    class="btn"
+    type="button"
+    (click)="togglePlay()"
+    [disabled]="!(isReady$ | async)"
+  >
+    {{ (isPlaying$ | async) ? "Pause" : "Play" }}
+  </button>
+</div>
+
+<div class="p-5">
   <app-audio-player
     [isReady$]="isReady$"
     [videos]="videos$ | async"

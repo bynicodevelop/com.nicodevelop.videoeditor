@@ -4,6 +4,7 @@
       class="btn"
       type="button"
       (click)="onZoomOut()"
+      [disabled]="!(isReady$ | async)"
     >
       <fa-icon
         class="text-gray-600"
@@ -15,6 +16,7 @@
       class="btn"
       type="button"
       (click)="onZoomIn()"
+      [disabled]="!(isReady$ | async)"
     >
       <fa-icon
         class="text-gray-600"

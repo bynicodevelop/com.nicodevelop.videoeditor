@@ -3,6 +3,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
 import { RegionEntity } from 'src/app/models/region';
 import { VideoEntity } from 'src/app/models/video';
+import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
@@ -25,6 +26,8 @@ export class AudioPlayerComponent implements OnInit {
 
   @Input() isReady$: Observable<boolean> = new Observable<boolean>();
 
+  isPlaying$ = this.playerFacade.isPlaying();
+
   faMagnifyingGlassMinus = faMagnifyingGlassMinus;
   faMagnifyingGlassPlus = faMagnifyingGlassPlus;
   faWaveform = faWaveSquare;
@@ -42,7 +45,10 @@ export class AudioPlayerComponent implements OnInit {
   regionUpdated$: BehaviorSubject<RegionEntity | null> =
     new BehaviorSubject<RegionEntity | null>(null);
 
-  constructor(private regionFacade: RegionFacade) {}
+  constructor(
+    private regionFacade: RegionFacade,
+    private playerFacade: PlayerFacade
+  ) {}
 
   ngOnInit(): void {
     this.isReady$.subscribe((isReady): void => {
@@ -55,6 +61,14 @@ export class AudioPlayerComponent implements OnInit {
 
     this.levelZoom$.subscribe((levelZoom$): void => {
       this.wavesurfer?.zoom(levelZoom$);
+    });
+
+    this.isPlaying$.subscribe((isPlaying): void => {
+      if (isPlaying) {
+        this.wavesurfer?.play();
+      } else {
+        this.wavesurfer?.pause();
+      }
     });
   }
 

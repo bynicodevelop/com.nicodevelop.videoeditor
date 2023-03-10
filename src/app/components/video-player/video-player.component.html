@@ -1,4 +1,6 @@
 <video
   *ngFor="let video of videos$ | async"
   [src]="video.file | safeurl"
+  [muted]="true"
+  #videoPlayer
 ></video>

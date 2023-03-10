@@ -15,7 +15,7 @@ export const videoAdapter = createEntityAdapter<VideoEntity>({
 
 export const initialState: State = videoAdapter.getInitialState();
 
-export const videoReducers = createReducer(
+export const videoReducer = createReducer(
   initialState,
   on(
     uploadVideos,

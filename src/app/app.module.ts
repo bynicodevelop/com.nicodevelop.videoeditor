@@ -7,6 +7,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import * as fromPlayer from './stores/player/player.reducer';
 import * as fromRegion from './stores/regions/region.reducer';
 import { VideoEffects } from './stores/videos/video.effects';
 import * as fromVideo from './stores/videos/video.reducers';
@@ -18,8 +19,9 @@ import * as fromVideo from './stores/videos/video.reducers';
     AppRoutingModule,
     StoreModule.forRoot(
       {
-        [fromVideo.videoFeatureKey]: fromVideo.videoReducers,
+        [fromVideo.videoFeatureKey]: fromVideo.videoReducer,
         [fromRegion.regionFeatureKey]: fromRegion.regionReducer,
+        [fromPlayer.playerFeatureKey]: fromPlayer.playerReducer,
       },
       {
         runtimeChecks: {
