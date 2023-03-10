@@ -1,4 +1,11 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 
 import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
 import { RegionEntity } from 'src/app/models/region';
@@ -19,7 +26,7 @@ import {
   templateUrl: './audio-player.component.html',
   styleUrls: ['./audio-player.component.scss'],
 })
-export class AudioPlayerComponent implements OnInit {
+export class AudioPlayerComponent implements OnInit, AfterViewInit {
   @ViewChild('player') player!: ElementRef<HTMLDivElement>;
 
   @Input() videos!: VideoEntity[] | null;
@@ -52,9 +59,10 @@ export class AudioPlayerComponent implements OnInit {
 
   ngOnInit(): void {
     this.isReady$.subscribe((isReady): void => {
-      if (!isReady) return;
+      // TODO: Error handling
+      if (!isReady || !this.videos) return;
 
-      const video = this.videos![0];
+      const video = this.videos[0];
 
       this.wavesurfer?.load(URL.createObjectURL(video.file));
     });
@@ -82,7 +90,6 @@ export class AudioPlayerComponent implements OnInit {
     this.wavesurfer = WaveSurfer.create({
       container: this.player.nativeElement,
       waveColor: '#CCC',
-      // progressColor: 'purple',
       height: 100,
       plugins: [
         RegionsPlugin.create({
@@ -114,7 +121,10 @@ export class AudioPlayerComponent implements OnInit {
     });
 
     this.wavesurfer?.on('seek', (time: number): void => {
-      this.playerFacade.seek(time * this.wavesurfer!.getDuration());
+      // TODO: Fix seek
+      if (!this.wavesurfer) return;
+
+      this.playerFacade.seek(time * this.wavesurfer.getDuration());
     });
   }
 
