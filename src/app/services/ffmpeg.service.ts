@@ -26,10 +26,10 @@ export class FFmpegService {
 
   private async clean(filenamelist: string[] = []): Promise<void> {
     for (const filename of filenamelist) {
-      await this.ffmpeg.FS('unlink', filename);
+      this.ffmpeg.FS('unlink', filename);
     }
 
-    await this.ffmpeg.exit();
+    this.ffmpeg.exit();
   }
 
   private async _extractAudio(
