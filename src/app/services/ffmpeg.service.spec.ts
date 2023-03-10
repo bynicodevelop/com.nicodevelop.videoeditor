@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { FfmpegService } from './ffmpeg.service';
+import { FFmpegService } from './ffmpeg.service';
 
 describe('FfmpegService', () => {
-  let service: FfmpegService;
+  let service: FFmpegService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(FfmpegService);
+    service = TestBed.inject(FFmpegService);
   });
 
   it('should be created', () => {
