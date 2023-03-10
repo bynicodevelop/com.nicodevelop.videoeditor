@@ -21,7 +21,7 @@ const log = (reducer: ActionReducer<State>): ActionReducer<State> => {
 
 export const videoFeatureKey = 'video';
 
-export interface State extends EntityState<VideoEntity> {}
+export type State = EntityState<VideoEntity>
 
 export const videoAdapter = createEntityAdapter<VideoEntity>({
   selectId: (video: VideoEntity): string => video.uid,

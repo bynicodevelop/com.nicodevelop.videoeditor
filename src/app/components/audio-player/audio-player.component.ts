@@ -29,9 +29,9 @@ export class AudioPlayerComponent implements OnInit {
 
   levelZoom: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-  levelZoomMin: number = 0;
+  levelZoomMin = 0;
 
-  levelZoomMax: number = 100;
+  levelZoomMax = 100;
 
   private wavesurfer?: WaveSurfer;
 

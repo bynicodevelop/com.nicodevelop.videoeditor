@@ -7,11 +7,11 @@ import { Component, EventEmitter, HostListener, Output } from '@angular/core';
 })
 export class DropzoneComponent {
   @Output()
-  onUploadFile: EventEmitter<File[]> = new EventEmitter<File[]>();
+  uploadFile: EventEmitter<File[]> = new EventEmitter<File[]>();
 
-  dragOver: boolean = false;
+  dragover = false;
 
-  onFileDropped($event: Event | DragEvent): void {
+  fileDropped($event: Event | DragEvent): void {
     const files =
       $event instanceof DragEvent
         ? Array.from($event.dataTransfer?.files || [])
@@ -21,30 +21,30 @@ export class DropzoneComponent {
       return;
     }
 
-    this.onUploadFile.emit(files);
+    this.uploadFile.emit(files);
   }
 
   @HostListener('dragover', ['$event'])
-  onDragOver(event: any): void {
+  dragOver(event: any): void {
     event.preventDefault();
 
-    this.dragOver = true;
+    this.dragover = true;
   }
 
   @HostListener('dragleave', ['$event'])
-  onDragLeave(event: any): void {
+  dragLeave(event: any): void {
     event.preventDefault();
 
-    this.dragOver = false;
+    this.dragover = false;
   }
 
   @HostListener('drop', ['$event'])
-  onDrop(event: any): void {
+  drop(event: any): void {
     event.preventDefault();
     event.stopPropagation();
 
-    this.onFileDropped(event);
+    this.fileDropped(event);
 
-    this.dragOver = false;
+    this.dragover = false;
   }
 }
