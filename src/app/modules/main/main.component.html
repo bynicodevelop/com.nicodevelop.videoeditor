@@ -20,17 +20,10 @@
     {{ (isPlaying$ | async) ? "Pause" : "Lecture" }}
   </button>
 
-  <button
-    class="btn"
-    type="button"
+  <app-download-button
     [disabled]="!(isReady$ | async)"
-    (click)="onExportVideo()"
-  >
-    <fa-icon
-      class="text-gray-600"
-      [icon]="faDownload"
-    ></fa-icon>
-  </button>
+    [video]="currentVideo"
+  ></app-download-button>
 </div>
 
 <div class="p-5">

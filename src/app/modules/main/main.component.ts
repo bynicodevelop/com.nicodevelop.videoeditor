@@ -14,8 +14,6 @@ import { faDownload } from '@fortawesome/free-solid-svg-icons';
 })
 export class MainComponent implements OnInit {
   videos$: Observable<VideoEntity[]> = this.videoFacade.getVideos();
-  downloadableVideos$: Observable<VideoEntity[]> =
-    this.videoFacade.downloadableVideos();
 
   isReady$: Observable<boolean> = this.videoFacade.videoLoaded();
   isPlaying$: Observable<boolean> = this.playerFacade.isPlaying();
@@ -40,25 +38,10 @@ export class MainComponent implements OnInit {
         this.currentVideo = videos[0];
       }
     });
-
-    this.downloadableVideos$.subscribe((videos): void => {
-      for (const video of videos) {
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(video.output!);
-        a.download = video.file.name;
-        a.click();
-      }
-    });
   }
 
   onUploadFile(files: File[]): void {
     this.videoFacade.uploadVideos(files);
-  }
-
-  onExportVideo(): void {
-    if (!this.currentVideo) return;
-
-    this.videoFacade.exportVideo(this.currentVideo);
   }
 
   togglePlay(): void {
