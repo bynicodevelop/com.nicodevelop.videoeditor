@@ -1,7 +1,9 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
+import { RegionEntity } from 'src/app/models/region';
 import { VideoEntity } from 'src/app/models/video';
+import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
 
@@ -35,6 +37,11 @@ export class AudioPlayerComponent implements OnInit {
 
   private wavesurfer?: WaveSurfer;
 
+  regionUpdated$: BehaviorSubject<RegionEntity> =
+    new BehaviorSubject<RegionEntity>({} as RegionEntity);
+
+  constructor(private regionFacade: RegionFacade) {}
+
   ngOnInit(): void {
     this.isReady$.subscribe((isReady): void => {
       if (!isReady) return;
@@ -57,7 +64,34 @@ export class AudioPlayerComponent implements OnInit {
       barHeight: 1,
       barWidth: 1,
       height: 100,
-      plugins: [RegionsPlugin.create({})],
+      plugins: [
+        RegionsPlugin.create({
+          dragSelection: true,
+        }),
+      ],
+    });
+
+    // listen to the region create event
+    this.wavesurfer?.on('region-created', (region): void => {
+      this.regionFacade.addRegion({
+        uid: region.id,
+        start: region.start,
+        end: region.end,
+        duration: region.end - region.start,
+      });
+    });
+
+    this.wavesurfer?.on('region-updated', (region): void => {
+      this.regionUpdated$.next({
+        uid: region.id,
+        start: region.start,
+        end: region.end,
+        duration: region.end - region.start,
+      });
+    });
+
+    this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
+      this.regionFacade.updateRegion(region);
     });
   }
 

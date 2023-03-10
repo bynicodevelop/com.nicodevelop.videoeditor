@@ -1,6 +1,6 @@
 import { uidFromFile } from '../core/lib/uid';
 
-export interface uid {
+export interface IUid {
   uid: string;
 }
 
@@ -12,7 +12,7 @@ export interface IVideo {
   file: File;
 }
 
-export type VideoEntity = IVideo & uid & Partial<IAudios>;
+export type VideoEntity = IVideo & IUid & Partial<IAudios>;
 
 export function videoEntityFactory(video: IVideo, audio?: Blob): VideoEntity {
   return {
