@@ -2,7 +2,7 @@ import { PlayerEntity } from 'src/app/models/player';
 
 import { createReducer, on } from '@ngrx/store';
 
-import { pause, play } from './player.actions';
+import { pause, play, seek } from './player.actions';
 
 export const playerFeatureKey = 'player';
 
@@ -21,5 +21,9 @@ export const playerReducer = createReducer(
   on(pause, (state): any => ({
     ...state,
     isPlaying: false,
+  })),
+  on(seek, (state, { time }): any => ({
+    ...state,
+    seek: time,
   }))
 );

@@ -1,4 +1,10 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 
 import { Observable } from 'rxjs';
 import { VideoEntity } from 'src/app/models/video';
@@ -18,16 +24,24 @@ export class VideoPlayerComponent implements OnInit {
 
   isPlaying$ = this.playerFacade.isPlaying();
 
+  seek$ = this.playerFacade.getSeek();
+
   constructor(readonly playerFacade: PlayerFacade) {}
 
   ngOnInit(): void {
-    this.isPlaying$.subscribe((isPlaying) => {
+    this.isPlaying$.subscribe((isPlaying): void => {
       if (this.videoPlayer) {
         if (isPlaying) {
           this.videoPlayer.nativeElement.play();
         } else {
           this.videoPlayer.nativeElement.pause();
         }
+      }
+    });
+
+    this.seek$.subscribe((seek): void => {
+      if (this.videoPlayer) {
+        this.videoPlayer.nativeElement.currentTime = seek;
       }
     });
   }

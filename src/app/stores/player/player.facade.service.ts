@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 
-import { pause, play } from './player.actions';
+import { pause, play, seek } from './player.actions';
 import { StatePlayer } from './player.reducer';
-import { isPlaying } from './player.selectors';
+import { getSeek, isPlaying } from './player.selectors';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +20,14 @@ export class PlayerFacade {
 
   pause(): void {
     this.store.dispatch(pause());
+  }
+
+  seek(time: number): void {
+    this.store.dispatch(seek({ time }));
+  }
+
+  getSeek(): Observable<number> {
+    return this.store.select(getSeek);
   }
 
   isPlaying(): Observable<boolean> {

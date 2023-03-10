@@ -9,3 +9,8 @@ export const isPlaying = createSelector(
   selectPlayerState,
   (state): boolean => state.isPlaying
 );
+
+export const getSeek = createSelector(
+  selectPlayerState,
+  (state): number => state.seek
+);

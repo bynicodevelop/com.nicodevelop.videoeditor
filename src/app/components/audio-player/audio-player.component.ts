@@ -70,6 +70,12 @@ export class AudioPlayerComponent implements OnInit {
         this.wavesurfer?.pause();
       }
     });
+
+    this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
+      if (!region) return;
+
+      this.regionFacade.addRegion(region);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -85,7 +91,6 @@ export class AudioPlayerComponent implements OnInit {
       ],
     });
 
-    // listen to the region create event
     this.wavesurfer?.on('region-created', (region): void => {
       this.regionFacade.getRegion(region.id).subscribe((current): void => {
         if (current) return;
@@ -108,10 +113,8 @@ export class AudioPlayerComponent implements OnInit {
       });
     });
 
-    this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
-      if (!region) return;
-
-      this.regionFacade.addRegion(region);
+    this.wavesurfer?.on('seek', (time: number): void => {
+      this.playerFacade.seek(time * this.wavesurfer!.getDuration());
     });
   }
 
