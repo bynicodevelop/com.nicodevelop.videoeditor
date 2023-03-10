@@ -6,7 +6,7 @@ import { pause, play } from './player.actions';
 
 export const playerFeatureKey = 'player';
 
-export interface StatePlayer extends PlayerEntity {}
+export type StatePlayer = PlayerEntity;
 
 export const initialState: StatePlayer = {
   isPlaying: false,

@@ -1,11 +1,11 @@
-import { reducer, initialState } from './region.reducer';
+import { initialState, regionReducer } from './region.reducer';
 
 describe('Region Reducer', () => {
   describe('an unknown action', () => {
     it('should return the previous state', () => {
       const action = {} as any;
 
-      const result = reducer(initialState, action);
+      const result = regionReducer(initialState, action);
 
       expect(result).toBe(initialState);
     });

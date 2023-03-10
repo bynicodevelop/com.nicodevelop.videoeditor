@@ -16,7 +16,7 @@ export class MainComponent implements OnInit {
   isReady$: Observable<boolean> = this.videoFacade.videoLoaded();
   isPlaying$: Observable<boolean> = this.playerFacade.isPlaying();
 
-  isPlaying: boolean = false;
+  isPlaying = false;
 
   constructor(
     private videoFacade: VideoFacade,
