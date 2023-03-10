@@ -35,11 +35,11 @@ export const videoReducers = createReducer(
     uploadVideos,
     (state, { videos }): State => videoAdapter.addMany(videos, state)
   ),
-  on(updateVideo, (state, { video }): State => {
-    console.log(video);
-    console.log(state);
-    return videoAdapter.updateOne({ id: video.uid, changes: video }, state);
-  })
+  on(
+    updateVideo,
+    (state, { video }): State =>
+      videoAdapter.updateOne({ id: video.uid, changes: video }, state)
+  )
 );
 
 export const videoMetaReducers: MetaReducer[] = [log];

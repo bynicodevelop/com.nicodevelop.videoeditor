@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 
 import { uploadVideos } from './video.actions';
 import { State } from './video.reducers';
-import { getVideos } from './video.selectors';
+import { getVideos, videoReady } from './video.selectors';
 
 @Injectable({
   providedIn: 'root',
@@ -30,5 +30,9 @@ export class VideoFacade {
 
   getVideos(): Observable<VideoEntity[]> {
     return this.store.select(getVideos);
+  }
+
+  videoLoaded(): Observable<boolean> {
+    return this.store.select(videoReady);
   }
 }

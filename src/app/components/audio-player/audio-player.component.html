@@ -1,0 +1,46 @@
+<div class="relative py-4">
+  <div class="space-x-3">
+    <button
+      class="btn"
+      type="button"
+      (click)="onZoomOut()"
+    >
+      <fa-icon
+        class="text-gray-600"
+        [icon]="faMagnifyingGlassMinus"
+      ></fa-icon>
+    </button>
+
+    <button
+      class="btn"
+      type="button"
+      (click)="onZoomIn()"
+    >
+      <fa-icon
+        class="text-gray-600"
+        [icon]="faMagnifyingGlassPlus"
+      ></fa-icon>
+    </button>
+  </div>
+
+  <div
+    *ngIf="!(isReady$ | async)"
+    class="flex justify-center items-center h-28"
+  >
+    <div class="inline-flex items-center justify-center w-full">
+      <hr class="w-full h-px my-2 bg-gray-200 border-0 rounded" />
+      <div class="absolute px-4 -translate-x-1/2 bg-white left-1/2">
+        <fa-icon
+          class="text-3xl text-gray-300"
+          [icon]="faWaveform"
+        >
+        </fa-icon>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="pt-6"
+    #player
+  ></div>
+</div>

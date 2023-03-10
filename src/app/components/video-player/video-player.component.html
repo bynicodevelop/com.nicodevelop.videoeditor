@@ -1,4 +1,4 @@
 <video
-  *ngFor="let video of videos"
+  *ngFor="let video of videos$ | async"
   [src]="video.file | safeurl"
 ></video>

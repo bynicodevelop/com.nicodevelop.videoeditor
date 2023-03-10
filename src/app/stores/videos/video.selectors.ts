@@ -7,3 +7,9 @@ const { selectAll } = videoAdapter.getSelectors();
 export const selectVideoState = createFeatureSelector<State>(videoFeatureKey);
 
 export const getVideos = createSelector(selectVideoState, selectAll);
+
+export const videoReady = createSelector(
+  selectVideoState,
+  (state: State): boolean =>
+    selectAll(state).some((video): boolean => !!video.audio)
+);
