@@ -10,14 +10,26 @@
   ></app-video-player>
 </div>
 
-<div class="p-5">
+<div class="p-5 space-x-3">
   <button
     class="btn"
     type="button"
     (click)="togglePlay()"
     [disabled]="!(isReady$ | async)"
   >
-    {{ (isPlaying$ | async) ? "Pause" : "Play" }}
+    {{ (isPlaying$ | async) ? "Pause" : "Lecture" }}
+  </button>
+
+  <button
+    class="btn"
+    type="button"
+    [disabled]="!(isReady$ | async)"
+    (click)="onExportVideo()"
+  >
+    <fa-icon
+      class="text-gray-600"
+      [icon]="faDownload"
+    ></fa-icon>
   </button>
 </div>
 

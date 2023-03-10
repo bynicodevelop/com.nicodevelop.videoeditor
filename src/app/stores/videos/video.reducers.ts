@@ -3,7 +3,12 @@ import { VideoEntity } from 'src/app/models/video';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
 import { createReducer, on } from '@ngrx/store';
 
-import { updateVideo, uploadVideos } from './video.actions';
+import {
+  downloadVideo,
+  exportVideo,
+  updateVideo,
+  uploadVideos,
+} from './video.actions';
 
 export const videoFeatureKey = 'video';
 
@@ -23,6 +28,14 @@ export const videoReducer = createReducer(
   ),
   on(
     updateVideo,
+    (state, { video }): State =>
+      videoAdapter.updateOne({ id: video.uid, changes: video }, state)
+  ),
+  on(exportVideo, (state): State => {
+    return state;
+  }),
+  on(
+    downloadVideo,
     (state, { video }): State =>
       videoAdapter.updateOne({ id: video.uid, changes: video }, state)
   )

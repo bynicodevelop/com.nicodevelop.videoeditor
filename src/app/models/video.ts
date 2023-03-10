@@ -12,12 +12,31 @@ export interface IVideo {
   file: File;
 }
 
-export type VideoEntity = IVideo & IUid & Partial<IAudios>;
+export interface IExport {
+  output: Blob;
+}
 
-export function videoEntityFactory(video: IVideo, audio?: Blob): VideoEntity {
+export type VideoEntity = IVideo & IUid & Partial<IAudios> & Partial<IExport>;
+
+export function videoEntityFactory(
+  video: IVideo,
+  audio?: Blob,
+  exportVideo?: IExport
+): VideoEntity {
   return {
     ...video,
     uid: uidFromFile(video.file),
     audio,
+    ...exportVideo,
+  };
+}
+
+export function videoEntityFactoryForExport(
+  video: VideoEntity,
+  exportVideo?: IExport
+): VideoEntity {
+  return {
+    ...video,
+    ...exportVideo,
   };
 }

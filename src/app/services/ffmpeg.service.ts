@@ -4,6 +4,8 @@ import { defer, Observable } from 'rxjs';
 
 import { createFFmpeg, fetchFile, FFmpeg } from '@ffmpeg/ffmpeg';
 
+import { VideoEntity } from '../models/video';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -48,8 +50,6 @@ export class FFmpegService {
   }
 
   extractAudio(file: File): Observable<Blob> {
-    console.log('extractAudio', file);
-
     return defer(async (): Promise<Blob> => {
       await this._loadFFmpeg();
 
@@ -60,6 +60,56 @@ export class FFmpegService {
       await this.clean([outputFileName]);
 
       return audio;
+    });
+  }
+
+  exportVideo(videoEntity: VideoEntity): Observable<Blob> {
+    console.log('videoEntity', videoEntity);
+
+    return defer(async (): Promise<Blob> => {
+      await this._loadFFmpeg();
+
+      this.ffmpeg.FS(
+        'writeFile',
+        videoEntity.file.name,
+        await fetchFile(videoEntity.file)
+      );
+
+      this.ffmpeg.FS(
+        'writeFile',
+        `${videoEntity.file.name}.mp3`,
+        await fetchFile(videoEntity.audio!)
+      );
+
+      await this.ffmpeg.run(
+        '-i',
+        `${videoEntity.file.name}`,
+        '-i',
+        `${videoEntity.file.name}.mp3`,
+        '-c:v',
+        'copy',
+        '-c:a',
+        'aac',
+        // '-strict',
+        // 'experimental',
+        '-map',
+        '0:v:0',
+        '-map',
+        '1:a:0',
+        'output.mp4'
+      );
+
+      const data = this.ffmpeg.FS('readFile', 'output.mp4');
+
+      const video = new Blob([data.buffer], { type: 'video/mp4' });
+
+      await this.clean([
+        videoEntity.file.name,
+        `${videoEntity.file.name}.mp3`,
+        'output.mp4',
+      ]);
+
+      return video;
     });
   }
 }

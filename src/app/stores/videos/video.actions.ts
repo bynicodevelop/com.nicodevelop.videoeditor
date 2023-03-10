@@ -11,3 +11,13 @@ export const updateVideo = createAction(
   '[Video] Update Video',
   props<{ video: VideoEntity }>()
 );
+
+export const exportVideo = createAction(
+  '[Video] Export Video',
+  props<{ video: VideoEntity }>()
+);
+
+export const downloadVideo = createAction(
+  '[Video] Download Video',
+  props<{ video: VideoEntity }>()
+);

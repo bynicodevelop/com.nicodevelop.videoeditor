@@ -6,9 +6,9 @@ import { VideoEntity } from 'src/app/models/video';
 
 import { Store } from '@ngrx/store';
 
-import { uploadVideos } from './video.actions';
+import { exportVideo, uploadVideos } from './video.actions';
 import { State } from './video.reducers';
-import { getVideos, videoReady } from './video.selectors';
+import { downloadableVideos, getVideos, videoReady } from './video.selectors';
 
 @Injectable({
   providedIn: 'root',
@@ -34,5 +34,13 @@ export class VideoFacade {
 
   videoLoaded(): Observable<boolean> {
     return this.store.select(videoReady);
+  }
+
+  exportVideo(video: VideoEntity): void {
+    this.store.dispatch(exportVideo({ video }));
+  }
+
+  downloadableVideos(): Observable<VideoEntity[]> {
+    return this.store.select(downloadableVideos);
   }
 }

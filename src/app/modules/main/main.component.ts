@@ -5,6 +5,8 @@ import { VideoEntity } from 'src/app/models/video';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -12,11 +14,16 @@ import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 })
 export class MainComponent implements OnInit {
   videos$: Observable<VideoEntity[]> = this.videoFacade.getVideos();
+  downloadableVideos$: Observable<VideoEntity[]> =
+    this.videoFacade.downloadableVideos();
 
   isReady$: Observable<boolean> = this.videoFacade.videoLoaded();
   isPlaying$: Observable<boolean> = this.playerFacade.isPlaying();
 
   isPlaying = false;
+  currentVideo?: VideoEntity;
+
+  faDownload = faDownload;
 
   constructor(
     private videoFacade: VideoFacade,
@@ -27,10 +34,31 @@ export class MainComponent implements OnInit {
     this.isPlaying$.subscribe((isPlaying): void => {
       this.isPlaying = isPlaying;
     });
+
+    this.videos$.subscribe((videos): void => {
+      if (videos.length > 0) {
+        this.currentVideo = videos[0];
+      }
+    });
+
+    this.downloadableVideos$.subscribe((videos): void => {
+      for (const video of videos) {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(video.output!);
+        a.download = video.file.name;
+        a.click();
+      }
+    });
   }
 
   onUploadFile(files: File[]): void {
     this.videoFacade.uploadVideos(files);
+  }
+
+  onExportVideo(): void {
+    if (!this.currentVideo) return;
+
+    this.videoFacade.exportVideo(this.currentVideo);
   }
 
   togglePlay(): void {
