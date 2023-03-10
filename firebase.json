@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "dist/video_editor",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
