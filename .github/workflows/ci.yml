@@ -18,5 +18,3 @@ jobs:
       - run: npm i
       - run: npm run lint
       - run: npm run test:ci
-        env:
-          CI: true
