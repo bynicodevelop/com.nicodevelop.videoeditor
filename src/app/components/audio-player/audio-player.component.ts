@@ -29,7 +29,9 @@ export class AudioPlayerComponent implements OnInit {
   faMagnifyingGlassPlus = faMagnifyingGlassPlus;
   faWaveform = faWaveSquare;
 
-  levelZoom: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  regions$ = this.regionFacade.getRegions();
+
+  levelZoom$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   levelZoomMin = 0;
 
@@ -37,8 +39,8 @@ export class AudioPlayerComponent implements OnInit {
 
   private wavesurfer?: WaveSurfer;
 
-  regionUpdated$: BehaviorSubject<RegionEntity> =
-    new BehaviorSubject<RegionEntity>({} as RegionEntity);
+  regionUpdated$: BehaviorSubject<RegionEntity | null> =
+    new BehaviorSubject<RegionEntity | null>(null);
 
   constructor(private regionFacade: RegionFacade) {}
 
@@ -51,18 +53,16 @@ export class AudioPlayerComponent implements OnInit {
       this.wavesurfer?.load(URL.createObjectURL(video.file));
     });
 
-    this.levelZoom.subscribe((levelZoom): void => {
-      this.wavesurfer?.zoom(levelZoom);
+    this.levelZoom$.subscribe((levelZoom$): void => {
+      this.wavesurfer?.zoom(levelZoom$);
     });
   }
 
   ngAfterViewInit(): void {
     this.wavesurfer = WaveSurfer.create({
       container: this.player.nativeElement,
-      waveColor: 'violet',
-      progressColor: 'purple',
-      barHeight: 1,
-      barWidth: 1,
+      waveColor: '#CCC',
+      // progressColor: 'purple',
       height: 100,
       plugins: [
         RegionsPlugin.create({
@@ -73,11 +73,15 @@ export class AudioPlayerComponent implements OnInit {
 
     // listen to the region create event
     this.wavesurfer?.on('region-created', (region): void => {
-      this.regionFacade.addRegion({
-        uid: region.id,
-        start: region.start,
-        end: region.end,
-        duration: region.end - region.start,
+      this.regionFacade.getRegion(region.id).subscribe((current): void => {
+        if (current) return;
+
+        this.regionFacade.addRegion({
+          uid: region.id,
+          start: region.start,
+          end: region.end,
+          duration: region.end - region.start,
+        });
       });
     });
 
@@ -91,19 +95,21 @@ export class AudioPlayerComponent implements OnInit {
     });
 
     this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
-      this.regionFacade.updateRegion(region);
+      if (!region) return;
+
+      this.regionFacade.addRegion(region);
     });
   }
 
   onZoomIn(): void {
-    if (this.levelZoom.value >= this.levelZoomMax) return;
+    if (this.levelZoom$.value >= this.levelZoomMax) return;
 
-    this.levelZoom.next(this.levelZoom.value + 10);
+    this.levelZoom$.next(this.levelZoom$.value + 10);
   }
 
   onZoomOut(): void {
-    if (this.levelZoom.value <= this.levelZoomMin) return;
+    if (this.levelZoom$.value <= this.levelZoomMin) return;
 
-    this.levelZoom.next(this.levelZoom.value - 10);
+    this.levelZoom$.next(this.levelZoom$.value - 10);
   }
 }

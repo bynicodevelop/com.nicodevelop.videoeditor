@@ -12,3 +12,8 @@ export const getRegionById = (id: string) =>
   createSelector(selectRegionState, (state: State): RegionEntity | undefined =>
     selectAll(state).find((region) => region.uid === id)
   );
+
+export const getRegions = createSelector(
+  selectRegionState,
+  (state: State): RegionEntity[] => selectAll(state)
+);
