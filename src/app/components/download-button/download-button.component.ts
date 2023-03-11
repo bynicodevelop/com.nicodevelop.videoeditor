@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { Observable } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
 import { VideoEntity } from 'src/app/models/video';
+import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
@@ -16,12 +17,17 @@ export class DownloadButtonComponent implements OnInit {
 
   @Input() video?: VideoEntity;
 
+  cuts$ = this.cutsFacade.getCuts();
+
   downloadableVideos$: Observable<VideoEntity[]> =
     this.videoFacade.downloadableVideos();
 
   faDownload = faDownload;
 
-  constructor(private videoFacade: VideoFacade) {}
+  constructor(
+    private videoFacade: VideoFacade,
+    private cutsFacade: CutsFacade
+  ) {}
 
   ngOnInit(): void {
     this.downloadableVideos$.subscribe((videos): void => {
@@ -34,10 +40,12 @@ export class DownloadButtonComponent implements OnInit {
     });
   }
 
-  onExportVideo(): void {
+  async onExportVideo(): Promise<void> {
     // TODO: Error handling
     if (!this.video) return;
 
-    this.videoFacade.exportVideo(this.video);
+    console.log(await lastValueFrom(this.cuts$));
+
+    this.videoFacade.exportVideo(this.video, await lastValueFrom(this.cuts$));
   }
 }
