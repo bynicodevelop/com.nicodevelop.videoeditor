@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 import { uidFromFile } from 'src/app/core/lib/uid';
+import { CutEntity } from 'src/app/models/cuts';
 import { VideoEntity } from 'src/app/models/video';
 
 import { Store } from '@ngrx/store';
 
-import { exportVideo, uploadVideos } from './video.actions';
+import { exportVideo, updateVideo, uploadVideos } from './video.actions';
 import { State } from './video.reducers';
 import { downloadableVideos, getVideos, videoReady } from './video.selectors';
 
@@ -28,6 +29,10 @@ export class VideoFacade {
     this.store.dispatch(uploadVideos({ videos }));
   }
 
+  updateVideo(video: VideoEntity): void {
+    this.store.dispatch(updateVideo({ video }));
+  }
+
   getVideos(): Observable<VideoEntity[]> {
     return this.store.select(getVideos);
   }
@@ -36,8 +41,8 @@ export class VideoFacade {
     return this.store.select(videoReady);
   }
 
-  exportVideo(video: VideoEntity): void {
-    this.store.dispatch(exportVideo({ video }));
+  exportVideo(video: VideoEntity, cuts: CutEntity[] = []): void {
+    this.store.dispatch(exportVideo({ video, cuts }));
   }
 
   downloadableVideos(): Observable<VideoEntity[]> {

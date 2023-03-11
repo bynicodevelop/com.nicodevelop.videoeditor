@@ -1,3 +1,4 @@
+import { CutEntity } from 'src/app/models/cuts';
 import { VideoEntity } from 'src/app/models/video';
 
 import { createAction, props } from '@ngrx/store';
@@ -14,7 +15,7 @@ export const updateVideo = createAction(
 
 export const exportVideo = createAction(
   '[Video] Export Video',
-  props<{ video: VideoEntity }>()
+  props<{ video: VideoEntity; cuts: CutEntity[] }>()
 );
 
 export const downloadVideo = createAction(

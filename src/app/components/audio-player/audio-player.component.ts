@@ -10,8 +10,10 @@ import {
 import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
 import { RegionEntity } from 'src/app/models/region';
 import { VideoEntity } from 'src/app/models/video';
+import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
+import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 import WaveSurfer from 'wavesurfer.js';
 import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
 
@@ -54,7 +56,9 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
 
   constructor(
     private regionFacade: RegionFacade,
-    private playerFacade: PlayerFacade
+    private playerFacade: PlayerFacade,
+    private videoFacade: VideoFacade,
+    private cutsFacade: CutsFacade
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +75,12 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
       this.wavesurfer?.zoom(levelZoom$);
     });
 
+    this.regions$.subscribe((regions): void => {
+      if (regions.length === 0) return;
+
+      this.cutsFacade.addRegions(regions, this.videos?.[0].duration || 0);
+    });
+
     this.isPlaying$.subscribe((isPlaying): void => {
       if (isPlaying) {
         this.wavesurfer?.play();
@@ -82,7 +92,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
       if (!region) return;
 
-      this.regionFacade.addRegion(region);
+      this.regionFacade.updateRegion(region);
     });
   }
 
@@ -96,6 +106,17 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
           dragSelection: true,
         }),
       ],
+    });
+
+    this.wavesurfer?.on('ready', (): void => {
+      const video = this.videos?.[0];
+
+      const updateVideo = {
+        ...video,
+        duration: this.wavesurfer?.getDuration() || 0,
+      } as VideoEntity;
+
+      this.videoFacade.updateVideo(updateVideo);
     });
 
     this.wavesurfer?.on('region-created', (region): void => {
