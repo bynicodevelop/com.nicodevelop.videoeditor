@@ -44,8 +44,6 @@ export class DownloadButtonComponent implements OnInit {
     // TODO: Error handling
     if (!this.video) return;
 
-    console.log(await lastValueFrom(this.cuts$));
-
     this.videoFacade.exportVideo(this.video, await lastValueFrom(this.cuts$));
   }
 }

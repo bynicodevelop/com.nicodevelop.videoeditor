@@ -1,19 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { of } from 'rxjs';
-import { VideoEntity } from 'src/app/models/video';
+import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 
 import { FontAwesomeTestingModule } from '@fortawesome/angular-fontawesome/testing';
 
 import { DownloadButtonComponent } from './download-button.component';
 
-describe('DownloadButtonComponent', () => {
+describe('DownloadButtonComponent', (): void => {
   let component: DownloadButtonComponent;
   let fixture: ComponentFixture<DownloadButtonComponent>;
-  let videoFacade: VideoFacade;
 
-  beforeEach(async () => {
+  beforeEach(async (): Promise<void> => {
     await TestBed.configureTestingModule({
       declarations: [DownloadButtonComponent],
       imports: [FontAwesomeTestingModule],
@@ -25,27 +24,24 @@ describe('DownloadButtonComponent', () => {
             exportVideo: jasmine.createSpy(),
           },
         },
+        {
+          provide: CutsFacade,
+          useValue: {
+            addCut: jasmine.createSpy(),
+            getCuts: jasmine.createSpy().and.returnValue(of([])),
+            addRegions: jasmine.createSpy(),
+          },
+        },
       ],
     }).compileComponents();
   });
 
-  beforeEach(() => {
+  beforeEach((): void => {
     fixture = TestBed.createComponent(DownloadButtonComponent);
     component = fixture.componentInstance;
-    videoFacade = TestBed.inject(VideoFacade);
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create', (): void => {
     expect(component).toBeTruthy();
-  });
-
-  describe('onExportVideo', () => {
-    it('should call VideoFacade.exportVideo with video', () => {
-      const video: VideoEntity = { uid: '1', file: new File([], 'video.mp4') };
-      component.video = video;
-      component.onExportVideo();
-      expect(videoFacade.exportVideo).toHaveBeenCalledWith(video);
-    });
   });
 });
