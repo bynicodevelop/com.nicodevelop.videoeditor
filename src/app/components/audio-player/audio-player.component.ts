@@ -71,8 +71,8 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
       this.wavesurfer?.load(URL.createObjectURL(video.file));
     });
 
-    this.levelZoom$.subscribe((levelZoom$): void => {
-      this.wavesurfer?.zoom(levelZoom$);
+    this.levelZoom$.subscribe((levelZoom): void => {
+      this.wavesurfer?.zoom(Number(levelZoom));
     });
 
     this.regions$.subscribe((regions): void => {
@@ -115,7 +115,6 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
         ...video,
         duration: this.wavesurfer?.getDuration() || 0,
       } as VideoEntity;
-
       this.videoFacade.updateVideo(updateVideo);
     });
 

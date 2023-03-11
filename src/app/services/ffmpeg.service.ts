@@ -74,36 +74,6 @@ export class FFmpegService {
     return audio;
   }
 
-  private async _compressVideo(file: File, audio: Blob): Promise<Blob> {
-    this.ffmpeg.FS('writeFile', file.name, await fetchFile(file));
-
-    const audioFileName = `${getFileNameFromFile(file.name)}.mp3`;
-
-    this.ffmpeg.FS('writeFile', audioFileName, await fetchFile(audio));
-
-    await this.ffmpeg.run(
-      '-i',
-      `${file.name}`,
-      '-i',
-      audioFileName,
-      '-c:v',
-      'copy',
-      '-c:a',
-      'aac',
-      '-map',
-      '0:v:0',
-      '-map',
-      '1:a:0',
-      'output.mp4'
-    );
-
-    const data = this.ffmpeg.FS('readFile', 'output.mp4');
-
-    const video = new Blob([data.buffer], { type: 'video/mp4' });
-
-    return video;
-  }
-
   /**
    * Exporte une vidéo concaténée à partir d'un fichier de concaténation et d'un nom de fichier de sortie.
    * @param outpuFileName Le nom du fichier de sortie pour la vidéo concaténée.
@@ -141,29 +111,19 @@ export class FFmpegService {
    */
   private async _cutVideo(
     start: number,
-    end: number | null,
+    end: number,
     inputPath: string,
     outputPath: string
   ): Promise<Uint8Array> {
-    if (end) {
-      await this.ffmpeg.run(
-        '-i',
-        inputPath,
-        '-ss',
-        start.toString(),
-        '-to',
-        end.toString(),
-        outputPath
-      );
-    } else {
-      await this.ffmpeg.run(
-        '-i',
-        inputPath,
-        '-ss',
-        start.toString(),
-        outputPath
-      );
-    }
+    await this.ffmpeg.run(
+      '-i',
+      inputPath,
+      '-ss',
+      start.toString(),
+      '-to',
+      end.toString(),
+      outputPath
+    );
 
     return this.ffmpeg.FS(`readFile`, outputPath);
   }
@@ -182,44 +142,35 @@ export class FFmpegService {
       (data): Blob => new Blob([data.buffer], { type: 'video/mp4' })
     );
 
-    const videoFilenames = [];
     const fileString = [];
 
     for (let i = 0; i < blobList.length; i++) {
       const blob = blobList[i];
-      const filename = `video${i}.mp4`;
+      const filename = `output${i}.mp4`;
 
-      videoFilenames.push(filename);
-      await this.ffmpeg.FS('writeFile', filename, await fetchFile(blob));
+      this.ffmpeg.FS('writeFile', filename, await fetchFile(blob));
 
       fileString.push(`file '${filename}'`);
     }
 
-    await this.ffmpeg.FS('writeFile', filename, fileString.join('\r'));
+    this.ffmpeg.FS('writeFile', filename, fileString.join('\r'));
   }
 
   private async _compressVideoWithCuts(
     file: File,
     cuts: CutEntity[]
   ): Promise<Blob> {
-    this.ffmpeg.FS('writeFile', file.name, await fetchFile(file));
-
     let i = 0;
     const listCut = [];
 
     for (const cut of cuts) {
       await this._loadFFmpeg();
 
-      // if (regions[i + 1]) {
+      this.ffmpeg.FS('writeFile', file.name, await fetchFile(file));
+
       listCut.push(
-        await this._cutVideo(
-          cut.start,
-          cuts[i + 1]?.start || null,
-          file.name,
-          `output${i}.mp4`
-        )
+        await this._cutVideo(cut.start, cut.end, file.name, `output${i}.mp4`)
       );
-      // }
 
       this.ffmpeg.exit();
 
@@ -227,6 +178,8 @@ export class FFmpegService {
     }
 
     await this._loadFFmpeg();
+
+    console.log(this.ffmpeg.FS('readdir', '.'));
 
     await this._createFileSilence(listCut, 'list.txt');
 
@@ -273,21 +226,6 @@ export class FFmpegService {
 
     return defer(async (): Promise<Blob> => {
       await this._loadFFmpeg();
-
-      if (cuts.length === 0) {
-        const video = await this._compressVideo(
-          videoEntity.file,
-          videoEntity.audio!
-        );
-
-        await this._clean([
-          videoEntity.file.name,
-          `${videoEntity.file.name}.mp3`,
-          'output.mp4',
-        ]);
-
-        return video;
-      }
 
       const video = await this._compressVideoWithCuts(videoEntity.file, cuts);
 

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { lastValueFrom, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+import { CutEntity } from 'src/app/models/cuts';
 import { VideoEntity } from 'src/app/models/video';
 import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
@@ -40,10 +41,21 @@ export class DownloadButtonComponent implements OnInit {
     });
   }
 
-  async onExportVideo(): Promise<void> {
+  onExportVideo(): void {
     // TODO: Error handling
     if (!this.video) return;
 
-    this.videoFacade.exportVideo(this.video, await lastValueFrom(this.cuts$));
+    this.cuts$
+      .subscribe((cuts): void => {
+        if (!cuts.length) {
+          cuts.push({
+            start: 0,
+            end: this.video!.duration || 0,
+          } as CutEntity);
+        }
+
+        this.videoFacade.exportVideo(this.video!, cuts);
+      })
+      .unsubscribe();
   }
 }

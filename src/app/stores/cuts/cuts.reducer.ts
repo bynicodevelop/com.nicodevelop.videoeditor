@@ -17,9 +17,5 @@ export const initialState: State = cutsAdapter.getInitialState();
 
 export const reducer = createReducer(
   initialState,
-  on(addCuts, (state, { cuts }): State => {
-    console.log('cuts', cuts);
-
-    return cutsAdapter.addMany(cuts, state);
-  })
+  on(addCuts, (state, { cuts }): State => cutsAdapter.setAll(cuts, state))
 );
