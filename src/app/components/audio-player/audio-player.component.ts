@@ -36,6 +36,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
   @Input() isReady$: Observable<boolean> = new Observable<boolean>();
 
   isPlaying$ = this.playerFacade.isPlaying();
+  seek$ = this.playerFacade.getSeek();
 
   faMagnifyingGlassMinus = faMagnifyingGlassMinus;
   faMagnifyingGlassPlus = faMagnifyingGlassPlus;
@@ -145,6 +146,20 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
       if (!this.wavesurfer) return;
 
       this.playerFacade.seek(time * this.wavesurfer.getDuration());
+    });
+
+    this.wavesurfer?.on('audioprocess', (time: number): void => {
+      if (!this.wavesurfer) return;
+
+      const regions = this.wavesurfer.regions.list;
+
+      const region = Object.values(regions).find((region): boolean => {
+        return region.start <= time && region.end >= time;
+      });
+
+      if (region) {
+        this.wavesurfer.seekTo(region.end / this.wavesurfer.getDuration());
+      }
     });
   }
 
