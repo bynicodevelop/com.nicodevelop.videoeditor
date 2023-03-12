@@ -1,8 +1,13 @@
-name: Test
+name: Test & Lint
+
 'on':
   push:
     branches:
       - develop
+  pull_request:
+    branches:
+      - develop
+      - main
 
 jobs:
   test:
