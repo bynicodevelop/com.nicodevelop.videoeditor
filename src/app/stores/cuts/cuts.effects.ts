@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { filter, map, tap } from 'rxjs';
+import { filter, map } from 'rxjs';
 import { CutEntity } from 'src/app/models/cuts';
 
 import { Actions, createEffect, ofType } from '@ngrx/effects';
@@ -16,8 +16,9 @@ export class CutsEffects {
   addRegion$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(convertRegion),
-      filter(({ regions }): boolean =>
-        regions.every((region) => region.start !== 0 && region.end !== 0)
+      filter(
+        ({ regions }): boolean =>
+          regions.filter((region) => region.end !== region.start).length > 0
       ),
       map(({ regions, duration }) => {
         if (regions.length === 1 && regions[0].start < MIN_CUT_DURATION) {
@@ -28,6 +29,10 @@ export class CutsEffects {
         }
         return { regions, duration };
       }),
+      map(({ regions, duration }) => ({
+        regions: regions.slice().sort((a, b) => a.start - b.start),
+        duration,
+      })),
       map(({ regions, duration }): CutEntity[] => {
         const cuts: CutEntity[] = [];
 
@@ -42,10 +47,6 @@ export class CutsEffects {
         for (let i = 0; i < regions.length; i++) {
           const region = regions[i];
           const nextRegion = regions[i + 1];
-
-          if (region.start < MIN_CUT_DURATION) {
-            region.start = region.end;
-          }
 
           if (nextRegion && region.end < nextRegion.start) {
             cuts.push({
@@ -64,7 +65,6 @@ export class CutsEffects {
 
         return cuts;
       }),
-      tap(console.log),
       map((cuts) => addCuts({ cuts }))
     );
   });

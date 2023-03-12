@@ -80,7 +80,7 @@ export class FFmpegService {
    * @param concatFileName Le nom du fichier de concaténation contenant la liste des fichiers à concaténer.
    * @returns Une promesse résolue avec un objet Blob représentant la vidéo concaténée.
    */
-  private async _exportVideo(
+  private async _contactVideo(
     outpuFileName: string,
     concatFileName: string
   ): Promise<Blob> {
@@ -185,7 +185,7 @@ export class FFmpegService {
 
     console.log(this.ffmpeg.FS('readdir', '.'));
 
-    const video = await this._exportVideo('output.mp4', 'list.txt');
+    const video = await this._contactVideo('output.mp4', 'list.txt');
 
     this.ffmpeg.exit();
 
