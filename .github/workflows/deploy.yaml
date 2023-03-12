@@ -19,6 +19,7 @@ jobs:
       - run: npm run test
 
   deploy:
+    needs: test_lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
