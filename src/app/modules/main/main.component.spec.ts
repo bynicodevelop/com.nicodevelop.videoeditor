@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AudioPlayerComponent } from 'src/app/components/audio-player/audio-player.component';
+import { ButtonComponent } from 'src/app/components/button/button.component';
 import { DownloadButtonComponent } from 'src/app/components/download-button/download-button.component';
 import { DropzoneComponent } from 'src/app/components/dropzone/dropzone.component';
 
@@ -20,6 +21,7 @@ describe('MainComponent', () => {
         DropzoneComponent,
         AudioPlayerComponent,
         DownloadButtonComponent,
+        ButtonComponent,
       ],
       imports: [StoreModule.forRoot({}), FontAwesomeModule],
     }).compileComponents();

@@ -12,14 +12,12 @@
 
 <div>
   <div class="p-5 space-x-3">
-    <button
-      class="btn"
-      type="button"
-      (click)="togglePlay()"
+    <app-button
       [disabled]="!(isReady$ | async)"
+      (click)="togglePlay()"
     >
       {{ (isPlaying$ | async) ? "Pause" : "Lecture" }}
-    </button>
+    </app-button>
 
     <app-download-button
       [disabled]="!(isReady$ | async)"

@@ -1,28 +1,18 @@
 <div class="relative py-4">
   <div class="space-x-3">
-    <button
-      class="btn"
-      type="button"
+    <app-button
+      [icon]="faMagnifyingGlassMinus"
+      tooltip="Réduire le zoom"
+      [disabled]="!(isReady$ | async)"
       (click)="onZoomOut()"
-      [disabled]="!(isReady$ | async)"
-    >
-      <fa-icon
-        class="text-gray-600"
-        [icon]="faMagnifyingGlassMinus"
-      ></fa-icon>
-    </button>
+    ></app-button>
 
-    <button
-      class="btn"
-      type="button"
-      (click)="onZoomIn()"
+    <app-button
+      [icon]="faMagnifyingGlassPlus"
+      tooltip="Zoomer"
       [disabled]="!(isReady$ | async)"
-    >
-      <fa-icon
-        class="text-gray-600"
-        [icon]="faMagnifyingGlassPlus"
-      ></fa-icon>
-    </button>
+      (click)="onZoomIn()"
+    ></app-button>
   </div>
 
   <div
