@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { StoreModule } from '@ngrx/store';
 
+import { ButtonComponent } from '../button/button.component';
 import { AudioPlayerComponent } from './audio-player.component';
 
 describe('AudioPlayerComponent', () => {
@@ -11,7 +12,7 @@ describe('AudioPlayerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AudioPlayerComponent],
+      declarations: [AudioPlayerComponent, ButtonComponent],
       imports: [StoreModule.forRoot({}), FontAwesomeModule],
     }).compileComponents();
 

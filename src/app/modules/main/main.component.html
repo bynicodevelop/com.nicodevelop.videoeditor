@@ -1,4 +1,4 @@
-<div class="w-3/5 md:w-1/3 aspect-[9/16] m-auto pt-5">
+<div class="w-7/12 sm:w-5/12 md:w-4/12 lg:w-5/12 aspect-[9/16] m-auto pt-5">
   <app-dropzone
     *ngIf="!(isReady$ | async)"
     (uploadFile)="onUploadFile($event)"
@@ -10,25 +10,25 @@
   ></app-video-player>
 </div>
 
-<div class="p-5 space-x-3">
-  <button
-    class="btn"
-    type="button"
-    (click)="togglePlay()"
-    [disabled]="!(isReady$ | async)"
-  >
-    {{ (isPlaying$ | async) ? "Pause" : "Lecture" }}
-  </button>
+<div>
+  <div class="p-5 space-x-3">
+    <app-button
+      [disabled]="!(isReady$ | async)"
+      (click)="togglePlay()"
+    >
+      {{ (isPlaying$ | async) ? "Pause" : "Lecture" }}
+    </app-button>
 
-  <app-download-button
-    [disabled]="!(isReady$ | async)"
-    [video]="currentVideo"
-  ></app-download-button>
-</div>
+    <app-download-button
+      [disabled]="!(isReady$ | async)"
+      [video]="currentVideo"
+    ></app-download-button>
+  </div>
 
-<div class="p-5">
-  <app-audio-player
-    [isReady$]="isReady$"
-    [videos]="videos$ | async"
-  ></app-audio-player>
+  <div class="p-5">
+    <app-audio-player
+      [isReady$]="isReady$"
+      [videos]="videos$ | async"
+    ></app-audio-player>
+  </div>
 </div>
