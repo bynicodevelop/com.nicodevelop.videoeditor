@@ -6,6 +6,7 @@ import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
 
 import { FontAwesomeTestingModule } from '@fortawesome/angular-fontawesome/testing';
 
+import { ButtonComponent } from '../button/button.component';
 import { DownloadButtonComponent } from './download-button.component';
 
 describe('DownloadButtonComponent', (): void => {
@@ -14,7 +15,7 @@ describe('DownloadButtonComponent', (): void => {
 
   beforeEach(async (): Promise<void> => {
     await TestBed.configureTestingModule({
-      declarations: [DownloadButtonComponent],
+      declarations: [DownloadButtonComponent, ButtonComponent],
       imports: [FontAwesomeTestingModule],
       providers: [
         {

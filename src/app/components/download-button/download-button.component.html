@@ -1,11 +1,6 @@
-<button
-  class="btn"
-  type="button"
+<app-button
+  [icon]="faDownload"
+  tooltip="Télécharger"
   [disabled]="disabled"
   (click)="onExportVideo()"
->
-  <fa-icon
-    class="text-gray-600"
-    [icon]="faDownload"
-  ></fa-icon>
-</button>
+></app-button>
