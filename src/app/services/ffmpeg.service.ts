@@ -14,7 +14,7 @@ import { VideoEntity } from '../models/video';
 export class FFmpegService {
   private ffmpeg: FFmpeg;
 
-  private duration: number = 0;
+  private duration = 0;
 
   constructor() {
     this.ffmpeg = createFFmpeg({

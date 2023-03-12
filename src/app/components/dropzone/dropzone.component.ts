@@ -25,21 +25,21 @@ export class DropzoneComponent {
   }
 
   @HostListener('dragover', ['$event'])
-  dragOver(event: any): void {
+  dragOver(event: Event): void {
     event.preventDefault();
 
     this.dragover = true;
   }
 
   @HostListener('dragleave', ['$event'])
-  dragLeave(event: any): void {
+  dragLeave(event: Event): void {
     event.preventDefault();
 
     this.dragover = false;
   }
 
   @HostListener('drop', ['$event'])
-  drop(event: any): void {
+  drop(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 

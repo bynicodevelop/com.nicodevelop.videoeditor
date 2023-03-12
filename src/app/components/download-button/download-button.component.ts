@@ -33,8 +33,10 @@ export class DownloadButtonComponent implements OnInit {
   ngOnInit(): void {
     this.downloadableVideos$.subscribe((videos): void => {
       for (const video of videos) {
+        if (!video.output) continue;
+
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(video.output!);
+        a.href = URL.createObjectURL(video.output);
         a.download = video.file.name;
         a.click();
       }
@@ -48,13 +50,17 @@ export class DownloadButtonComponent implements OnInit {
     this.cuts$
       .subscribe((cuts): void => {
         if (!cuts.length) {
+          const { duration = 0 } = this.video || {};
+
           cuts.push({
             start: 0,
-            end: this.video!.duration || 0,
+            end: duration,
           } as CutEntity);
         }
 
-        this.videoFacade.exportVideo(this.video!, cuts);
+        if (!this.video) return;
+
+        this.videoFacade.exportVideo(this.video, cuts);
       })
       .unsubscribe();
   }

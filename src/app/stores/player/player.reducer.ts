@@ -14,16 +14,25 @@ export const initialState: StatePlayer = {
 
 export const playerReducer = createReducer(
   initialState,
-  on(play, (state): any => ({
-    ...state,
-    isPlaying: true,
-  })),
-  on(pause, (state): any => ({
-    ...state,
-    isPlaying: false,
-  })),
-  on(seek, (state, { time }): any => ({
-    ...state,
-    seek: time,
-  }))
+  on(
+    play,
+    (state): StatePlayer => ({
+      ...state,
+      isPlaying: true,
+    })
+  ),
+  on(
+    pause,
+    (state): StatePlayer => ({
+      ...state,
+      isPlaying: false,
+    })
+  ),
+  on(
+    seek,
+    (state, { time }): StatePlayer => ({
+      ...state,
+      seek: time,
+    })
+  )
 );
