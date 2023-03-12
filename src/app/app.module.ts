@@ -7,6 +7,11 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { CutsEffects } from './stores/cuts/cuts.effects';
+import * as fromCut from './stores/cuts/cuts.reducer';
+import * as fromPlayer from './stores/player/player.reducer';
+import { RegionEffects } from './stores/regions/region.effects';
+import * as fromRegion from './stores/regions/region.reducer';
 import { VideoEffects } from './stores/videos/video.effects';
 import * as fromVideo from './stores/videos/video.reducers';
 
@@ -17,7 +22,10 @@ import * as fromVideo from './stores/videos/video.reducers';
     AppRoutingModule,
     StoreModule.forRoot(
       {
-        [fromVideo.videoFeatureKey]: fromVideo.videoReducers,
+        [fromVideo.videoFeatureKey]: fromVideo.videoReducer,
+        [fromRegion.regionFeatureKey]: fromRegion.regionReducer,
+        [fromPlayer.playerFeatureKey]: fromPlayer.playerReducer,
+        [fromCut.cutsFeatureKey]: fromCut.reducer,
       },
       {
         runtimeChecks: {
@@ -27,11 +35,8 @@ import * as fromVideo from './stores/videos/video.reducers';
         },
       }
     ),
-    StoreModule.forFeature(fromVideo.videoFeatureKey, fromVideo.videoReducers, {
-      metaReducers: [...fromVideo.videoMetaReducers],
-    }),
-    EffectsModule.forRoot([VideoEffects]),
-    EffectsModule.forFeature([VideoEffects]),
+    EffectsModule.forRoot([VideoEffects, RegionEffects, CutsEffects]),
+    EffectsModule.forFeature([VideoEffects, RegionEffects, CutsEffects]),
     StoreDevtoolsModule.instrument({
       name: 'Video editor',
       logOnly: isDevMode(),

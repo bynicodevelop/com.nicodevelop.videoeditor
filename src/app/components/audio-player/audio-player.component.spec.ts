@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { StoreModule } from '@ngrx/store';
+
 import { AudioPlayerComponent } from './audio-player.component';
 
 describe('AudioPlayerComponent', () => {
@@ -8,9 +11,9 @@ describe('AudioPlayerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AudioPlayerComponent ]
-    })
-    .compileComponents();
+      declarations: [AudioPlayerComponent],
+      imports: [StoreModule.forRoot({}), FontAwesomeModule],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AudioPlayerComponent);
     component = fixture.componentInstance;

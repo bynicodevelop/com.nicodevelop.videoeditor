@@ -1,10 +1,11 @@
-export type IdRegion = number;
+export interface IUid {
+  uid: string;
+}
 
 export interface IRegion {
-  id: IdRegion;
   start: number;
   end: number;
   duration: number;
 }
 
-export type RegionEntity = IRegion;
+export type RegionEntity = IRegion & IUid;
