@@ -16,7 +16,7 @@ jobs:
 
       - run: npm i
       - run: npm run lint
-      - run: npm run test
+      - run: npm run test:ci
 
   deploy:
     needs: test_lint
