@@ -7,15 +7,22 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  Observable,
+} from 'rxjs';
+import { OverlapType } from 'src/app/enums/overlay-type';
 import { RegionEntity } from 'src/app/models/region';
 import { VideoEntity } from 'src/app/models/video';
+import { RegionService } from 'src/app/services/region.service';
 import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
+import { environment } from 'src/environments/environment';
 import WaveSurfer from 'wavesurfer.js';
-import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
+import RegionsPlugin, { Region } from 'wavesurfer.js/src/plugin/regions';
 
 import {
   faMagnifyingGlassMinus,
@@ -59,7 +66,8 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     private regionFacade: RegionFacade,
     private playerFacade: PlayerFacade,
     private videoFacade: VideoFacade,
-    private cutsFacade: CutsFacade
+    private cutsFacade: CutsFacade,
+    private regionService: RegionService
   ) {}
 
   ngOnInit(): void {
@@ -93,7 +101,12 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
       if (!region) return;
 
-      this.regionFacade.updateRegion(region);
+      this.regionFacade.updateRegion(
+        region,
+        Object.values(this.wavesurfer?.regions.list || []).map(
+          (region: Region): string => region.id
+        )
+      );
     });
   }
 
@@ -120,19 +133,52 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     });
 
     this.wavesurfer?.on('region-created', (region): void => {
-      this.regionFacade.getRegion(region.id).subscribe((current): void => {
-        if (current) return;
+      this.regionFacade
+        .getRegion(region.id)
+        .subscribe((current): void => {
+          if (current) return;
 
-        this.regionFacade.addRegion({
-          uid: region.id,
-          start: region.start,
-          end: region.end,
-          duration: region.end - region.start,
-        });
-      });
+          this.regionFacade.addRegion({
+            uid: region.id,
+            start: region.start,
+            end: region.end,
+            duration: region.end - region.start,
+          });
+        })
+        .unsubscribe();
     });
 
-    this.wavesurfer?.on('region-updated', (region): void => {
+    this.wavesurfer?.on('region-updated', (region: Region): void => {
+      const overlaps = this.regionService.getOverlap(
+        region,
+        Object.values(this.wavesurfer?.regions.list || [])
+      );
+
+      const overlapsType = this.regionService.getOverlayType(region, overlaps);
+
+      if (overlapsType === OverlapType.START_LEFT) {
+        region.update({
+          end: overlaps[0].start,
+        });
+      }
+
+      if (overlapsType === OverlapType.ENCLOSES) {
+        overlaps[0].remove();
+      }
+
+      if (overlapsType === OverlapType.START_RIGHT) {
+        region.update({
+          start: overlaps[0].end,
+        });
+      }
+
+      if (
+        Number(region.end.toFixed(1)) - Number(region.start.toFixed(1)) <
+        environment.minimumDuration
+      ) {
+        region.remove();
+      }
+
       this.regionUpdated$.next({
         uid: region.id,
         start: region.start,

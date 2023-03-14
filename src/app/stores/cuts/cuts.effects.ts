@@ -65,6 +65,9 @@ export class CutsEffects {
 
         return cuts;
       }),
+      map((cuts): CutEntity[] =>
+        cuts.filter((cut): boolean => cut.end !== cut.start)
+      ),
       map((cuts) => addCuts({ cuts }))
     );
   });

@@ -2,9 +2,15 @@ import { TestBed } from '@angular/core/testing';
 
 import { RegionEntity } from 'src/app/models/region';
 
-import { Store, StoreModule } from '@ngrx/store';
+import {
+  Store,
+  StoreModule,
+} from '@ngrx/store';
 
-import { addRegion, updateRegion } from './region.actions';
+import {
+  addRegion,
+  updateRegion,
+} from './region.actions';
 import { RegionFacade } from './region.facade.service';
 
 describe('RegionFacade', () => {
@@ -48,8 +54,10 @@ describe('RegionFacade', () => {
     };
 
     spyOn(store, 'dispatch');
-    service.updateRegion(region);
+    service.updateRegion(region, []);
 
-    expect(store.dispatch).toHaveBeenCalledWith(updateRegion({ region }));
+    expect(store.dispatch).toHaveBeenCalledWith(
+      updateRegion({ region, regionsId: [] })
+    );
   });
 });
