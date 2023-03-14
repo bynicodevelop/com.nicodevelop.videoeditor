@@ -1,0 +1,11 @@
+:host {
+  .fa-spin {
+    display: inline-block;
+    transform: rotate(0deg);
+    animation: fa-spin 2s infinite linear;
+
+    @apply text-white text-4xl;
+  }
+}
+
+

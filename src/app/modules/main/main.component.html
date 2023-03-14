@@ -1,3 +1,5 @@
+<app-loading *ngIf="isUploading$.value"></app-loading>
+
 <div class="w-7/12 sm:w-5/12 md:w-4/12 lg:w-5/12 aspect-[9/16] m-auto pt-5">
   <app-dropzone
     *ngIf="!(isReady$ | async)"
