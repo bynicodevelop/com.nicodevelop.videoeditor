@@ -26,7 +26,6 @@ describe('RegionEffects', () => {
           useValue: {
             select: () => of(initialState),
             pipe: () => of(null),
-            dispatch: () => {},
           },
         },
       ],

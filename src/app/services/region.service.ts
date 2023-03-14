@@ -8,8 +8,6 @@ import { OverlapType } from '../enums/overlay-type';
   providedIn: 'root',
 })
 export class RegionService {
-  constructor() {}
-
   getOverlap(region: Region, regions: Region[]): Region[] {
     return regions.filter(
       (r): boolean =>
