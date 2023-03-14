@@ -7,9 +7,15 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  Observable,
+} from 'rxjs';
+import { OverlapType } from 'src/app/enums/overlay-type';
 import { RegionEntity } from 'src/app/models/region';
 import { VideoEntity } from 'src/app/models/video';
+import { RegionService } from 'src/app/services/region.service';
 import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
@@ -23,13 +29,6 @@ import {
   faMagnifyingGlassPlus,
   faWaveSquare,
 } from '@fortawesome/free-solid-svg-icons';
-
-enum OverlapType {
-  START_LEFT = 'start-left',
-  START_RIGHT = 'start-right',
-  ENCLOSES = 'encloses',
-  NONE = 'none',
-}
 
 @Component({
   selector: 'app-audio-player',
@@ -67,7 +66,8 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     private regionFacade: RegionFacade,
     private playerFacade: PlayerFacade,
     private videoFacade: VideoFacade,
-    private cutsFacade: CutsFacade
+    private cutsFacade: CutsFacade,
+    private regionService: RegionService
   ) {}
 
   ngOnInit(): void {
@@ -149,12 +149,12 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     });
 
     this.wavesurfer?.on('region-updated', (region: Region): void => {
-      const overlaps = this.listOverlapRegions(
+      const overlaps = this.regionService.getOverlap(
         region,
         Object.values(this.wavesurfer?.regions.list || [])
       );
 
-      const overlapsType = this.updateRegion(region, overlaps);
+      const overlapsType = this.regionService.getOverlayType(region, overlaps);
 
       if (overlapsType === OverlapType.START_LEFT) {
         region.update({
@@ -207,54 +207,6 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
         this.wavesurfer.seekTo(region.end / this.wavesurfer.getDuration());
       }
     });
-  }
-
-  listOverlapRegions(currentRegion: Region, region: Region[]): Region[] {
-    return region.filter(
-      (r): boolean =>
-        r !== currentRegion &&
-        currentRegion.start < r.end &&
-        currentRegion.end > r.start
-    );
-  }
-
-  updateRegion(region: Region, overlaps: Region[]): OverlapType {
-    let overlapsType = OverlapType.NONE;
-
-    if (overlaps.length > 0) {
-      overlaps.forEach((r): void => {
-        // Dans le cas ou le chevauchement est au début
-        if (
-          region.end < r.end &&
-          region.end > r.start &&
-          region.start < r.start
-        ) {
-          overlapsType = OverlapType.START_LEFT;
-
-          return;
-        }
-
-        // Dans le cas ou le chevauchement est à la fin
-        if (
-          region.start > r.start &&
-          region.start < r.end &&
-          region.end > r.end
-        ) {
-          overlapsType = OverlapType.START_RIGHT;
-
-          return;
-        }
-
-        // Dans le cas ou le chevauchement enveloppe
-        if (region.start < r.start && region.end > r.end) {
-          overlapsType = OverlapType.ENCLOSES;
-
-          return;
-        }
-      });
-    }
-
-    return overlapsType;
   }
 
   onZoomIn(): void {
