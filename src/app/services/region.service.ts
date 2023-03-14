@@ -53,4 +53,41 @@ export class RegionService {
 
     return overlapsType;
   }
+
+  toggleSelectRegion(region: Region, regions: Region[]): void {
+    const selectedClassName = 'selected';
+    const isSelected = region.attributes['class'] === selectedClassName;
+
+    Object.values(regions).forEach((r): void => {
+      r.update({
+        attributes: {
+          ...r.attributes,
+          class: '',
+        },
+      });
+    });
+
+    if (!isSelected) {
+      region.update({
+        attributes: {
+          ...region.attributes,
+          class: selectedClassName,
+        },
+      });
+    }
+  }
+
+  removeSelectedRegions(regions: Region[]): string | null {
+    const selectedClassName = 'selected';
+
+    const selectedRegion = Object.values(regions).find(
+      (r): boolean => r.attributes['class'] === selectedClassName
+    );
+
+    if (selectedRegion) {
+      selectedRegion.remove();
+    }
+
+    return selectedRegion?.id || null;
+  }
 }

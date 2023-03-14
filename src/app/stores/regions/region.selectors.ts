@@ -1,8 +1,15 @@
 import { RegionEntity } from 'src/app/models/region';
 
-import { createFeatureSelector, createSelector } from '@ngrx/store';
+import {
+  createFeatureSelector,
+  createSelector,
+} from '@ngrx/store';
 
-import { regionAdapter, regionFeatureKey, State } from './region.reducer';
+import {
+  regionAdapter,
+  regionFeatureKey,
+  State,
+} from './region.reducer';
 
 const { selectAll } = regionAdapter.getSelectors();
 
@@ -16,4 +23,10 @@ export const getRegionById = (id: string) =>
 export const getRegions = createSelector(
   selectRegionState,
   (state: State): RegionEntity[] => selectAll(state)
+);
+
+export const hasSelectedRegions = createSelector(
+  selectRegionState,
+  (state: State): boolean =>
+    selectAll(state).some((region): boolean => region.selected || false)
 );
