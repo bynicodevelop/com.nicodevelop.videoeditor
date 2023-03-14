@@ -5,20 +5,27 @@ import { RegionEntity } from 'src/app/models/region';
 
 import { Actions } from '@ngrx/effects';
 import { provideMockActions } from '@ngrx/effects/testing';
+import {
+  Store,
+  StoreModule,
+} from '@ngrx/store';
 
 import {
   addCuts,
   convertRegion,
 } from './cuts.actions';
 import { CutsEffects } from './cuts.effects';
+import { State } from './cuts.reducer';
 
 describe('CutsEffects', (): void => {
   let actions$: Observable<any>;
   let effects: CutsEffects;
+  let store: Store<State>;
 
   beforeEach((): void => {
     const actionsMock = jasmine.createSpyObj('Actions', ['pipe']);
     TestBed.configureTestingModule({
+      imports: [StoreModule.forRoot({})],
       providers: [
         CutsEffects,
         { provide: Actions, useValue: actionsMock },
@@ -27,6 +34,7 @@ describe('CutsEffects', (): void => {
     });
 
     effects = TestBed.inject(CutsEffects);
+    store = TestBed.inject(Store<State>);
   });
 
   it('should be created', (): void => {
@@ -250,6 +258,53 @@ describe('CutsEffects', (): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [{ uid: 'cut-1', start: 3, end: 10 }],
+        })
+      );
+    });
+  });
+
+  it('Should return empty array of cuts (8)', (): void => {
+    const regions = [] as RegionEntity[];
+
+    const duration = 10;
+
+    actions$ = new Observable((observer): void => {
+      observer.next(convertRegion({ regions, duration }));
+    });
+
+    effects.addRegion$.subscribe((action): void => {
+      expect(action).toEqual(
+        addCuts({
+          cuts: [],
+        })
+      );
+    });
+  });
+
+  it('Should return empty array of cuts (9)', (): void => {
+    const initialCuts = [
+      { uid: 'cut-1', start: 0, end: 1 },
+      { uid: 'cut-2', start: 3, end: 10 },
+    ];
+
+    const regions = [] as RegionEntity[];
+
+    const duration = 10;
+
+    store.dispatch(
+      addCuts({
+        cuts: initialCuts,
+      })
+    );
+
+    actions$ = new Observable((observer): void => {
+      observer.next(convertRegion({ regions, duration }));
+    });
+
+    effects.addRegion$.subscribe((action): void => {
+      expect(action).toEqual(
+        addCuts({
+          cuts: [],
         })
       );
     });

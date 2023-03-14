@@ -5,9 +5,17 @@ import { RegionEntity } from 'src/app/models/region';
 
 import { Store } from '@ngrx/store';
 
-import { addRegion, updateRegion } from './region.actions';
+import {
+  addRegion,
+  removeRegionByUid,
+  updateRegion,
+} from './region.actions';
 import { State } from './region.reducer';
-import { getRegionById, getRegions } from './region.selectors';
+import {
+  getRegionById,
+  getRegions,
+  hasSelectedRegions,
+} from './region.selectors';
 
 @Injectable({
   providedIn: 'root',
@@ -29,5 +37,13 @@ export class RegionFacade {
 
   updateRegion(region: RegionEntity, regionsId: string[]): void {
     this.store.dispatch(updateRegion({ region, regionsId }));
+  }
+
+  removeRegion(id: string): void {
+    this.store.dispatch(removeRegionByUid({ uid: id }));
+  }
+
+  hasSelectedRegions(): Observable<boolean> {
+    return this.store.select(hasSelectedRegions);
   }
 }

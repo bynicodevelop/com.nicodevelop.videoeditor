@@ -27,6 +27,7 @@ import RegionsPlugin, { Region } from 'wavesurfer.js/src/plugin/regions';
 import {
   faMagnifyingGlassMinus,
   faMagnifyingGlassPlus,
+  faTrash,
   faWaveSquare,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -38,16 +39,18 @@ import {
 export class AudioPlayerComponent implements OnInit, AfterViewInit {
   @ViewChild('player') player!: ElementRef<HTMLDivElement>;
 
-  @Input() videos!: VideoEntity[] | null;
+  @Input() videos: VideoEntity[] | null = null;
 
   @Input() isReady$: Observable<boolean> = new Observable<boolean>();
 
   isPlaying$ = this.playerFacade.isPlaying();
+  canRemove$ = this.regionFacade.hasSelectedRegions();
   seek$ = this.playerFacade.getSeek();
 
   faMagnifyingGlassMinus = faMagnifyingGlassMinus;
   faMagnifyingGlassPlus = faMagnifyingGlassPlus;
   faWaveform = faWaveSquare;
+  faTrash = faTrash;
 
   regions$ = this.regionFacade.getRegions();
 
@@ -85,9 +88,9 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     });
 
     this.regions$.subscribe((regions): void => {
-      if (regions.length === 0) return;
+      if (!this.videos || this.videos.length === 0) return;
 
-      this.cutsFacade.addRegions(regions, this.videos?.[0].duration || 0);
+      this.cutsFacade.addRegions(regions, this.videos[0].duration || 0);
     });
 
     this.isPlaying$.subscribe((isPlaying): void => {
@@ -184,6 +187,7 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
         start: region.start,
         end: region.end,
         duration: region.end - region.start,
+        selected: (region.attributes['class'] || '').includes('selected'),
       });
     });
 
@@ -208,8 +212,11 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
       }
     });
 
-    this.wavesurfer?.on('interaction', (region): void => {
-      console.log(region);
+    this.wavesurfer?.on('region-click', (region: Region): void => {
+      this.regionService.toggleSelectRegion(
+        region,
+        Object.values(this.wavesurfer?.regions.list || [])
+      );
     });
   }
 
@@ -223,5 +230,15 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     if (this.levelZoom$.value <= this.levelZoomMin) return;
 
     this.levelZoom$.next(this.levelZoom$.value - 10);
+  }
+
+  onRemove(): void {
+    const regionId = this.regionService.removeSelectedRegions(
+      Object.values(this.wavesurfer?.regions.list || [])
+    );
+
+    if (!regionId) return;
+
+    this.regionFacade.removeRegion(regionId);
   }
 }

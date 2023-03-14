@@ -13,6 +13,13 @@
       [disabled]="!(isReady$ | async)"
       (click)="onZoomIn()"
     ></app-button>
+
+    <app-button
+      [icon]="faTrash"
+      tooltip="Supprimer"
+      (click)="onRemove()"
+      [disabled]="!(canRemove$ | async)"
+    ></app-button>
   </div>
 
   <div

@@ -1,0 +1,12 @@
+.wavesurfer-region {
+  background-color: rgba(209, 213, 219, .3) !important;
+
+  .wavesurfer-handle {
+    background-color: rgb(75, 85, 99) !important;
+    width: 1px !important;
+  }
+
+  &[data-region-class="selected"] {
+    background-color: rgb(75, 85, 99, .3) !important;
+  }
+}

@@ -1,6 +1,9 @@
 import { RegionEntity } from 'src/app/models/region';
 
-import { createAction, props } from '@ngrx/store';
+import {
+  createAction,
+  props,
+} from '@ngrx/store';
 
 export const loadRegions = createAction('[Region] Load Regions');
 
@@ -22,4 +25,9 @@ export const addRegion = createAction(
 export const updateRegion = createAction(
   '[Region] Update Region',
   props<{ region: RegionEntity; regionsId: string[] }>()
+);
+
+export const removeRegionByUid = createAction(
+  '[Region] Remove Region By Uid',
+  props<{ uid: string }>()
 );
