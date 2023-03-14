@@ -14,14 +14,22 @@ import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
+import { environment } from 'src/environments/environment';
 import WaveSurfer from 'wavesurfer.js';
-import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
+import RegionsPlugin, { Region } from 'wavesurfer.js/src/plugin/regions';
 
 import {
   faMagnifyingGlassMinus,
   faMagnifyingGlassPlus,
   faWaveSquare,
 } from '@fortawesome/free-solid-svg-icons';
+
+enum OverlapType {
+  START_LEFT = 'start-left',
+  START_RIGHT = 'start-right',
+  ENCLOSES = 'encloses',
+  NONE = 'none',
+}
 
 @Component({
   selector: 'app-audio-player',
@@ -93,7 +101,12 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
       if (!region) return;
 
-      this.regionFacade.updateRegion(region);
+      this.regionFacade.updateRegion(
+        region,
+        Object.values(this.wavesurfer?.regions.list || []).map(
+          (region: Region): string => region.id
+        )
+      );
     });
   }
 
@@ -120,19 +133,52 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     });
 
     this.wavesurfer?.on('region-created', (region): void => {
-      this.regionFacade.getRegion(region.id).subscribe((current): void => {
-        if (current) return;
+      this.regionFacade
+        .getRegion(region.id)
+        .subscribe((current): void => {
+          if (current) return;
 
-        this.regionFacade.addRegion({
-          uid: region.id,
-          start: region.start,
-          end: region.end,
-          duration: region.end - region.start,
-        });
-      });
+          this.regionFacade.addRegion({
+            uid: region.id,
+            start: region.start,
+            end: region.end,
+            duration: region.end - region.start,
+          });
+        })
+        .unsubscribe();
     });
 
-    this.wavesurfer?.on('region-updated', (region): void => {
+    this.wavesurfer?.on('region-updated', (region: Region): void => {
+      const overlaps = this.listOverlapRegions(
+        region,
+        Object.values(this.wavesurfer?.regions.list || [])
+      );
+
+      const overlapsType = this.updateRegion(region, overlaps);
+
+      if (overlapsType === OverlapType.START_LEFT) {
+        region.update({
+          end: overlaps[0].start,
+        });
+      }
+
+      if (overlapsType === OverlapType.ENCLOSES) {
+        overlaps[0].remove();
+      }
+
+      if (overlapsType === OverlapType.START_RIGHT) {
+        region.update({
+          start: overlaps[0].end,
+        });
+      }
+
+      if (
+        Number(region.end.toFixed(1)) - Number(region.start.toFixed(1)) <
+        environment.minimumDuration
+      ) {
+        region.remove();
+      }
+
       this.regionUpdated$.next({
         uid: region.id,
         start: region.start,
@@ -161,6 +207,54 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
         this.wavesurfer.seekTo(region.end / this.wavesurfer.getDuration());
       }
     });
+  }
+
+  listOverlapRegions(currentRegion: Region, region: Region[]): Region[] {
+    return region.filter(
+      (r): boolean =>
+        r !== currentRegion &&
+        currentRegion.start < r.end &&
+        currentRegion.end > r.start
+    );
+  }
+
+  updateRegion(region: Region, overlaps: Region[]): OverlapType {
+    let overlapsType = OverlapType.NONE;
+
+    if (overlaps.length > 0) {
+      overlaps.forEach((r): void => {
+        // Dans le cas ou le chevauchement est au début
+        if (
+          region.end < r.end &&
+          region.end > r.start &&
+          region.start < r.start
+        ) {
+          overlapsType = OverlapType.START_LEFT;
+
+          return;
+        }
+
+        // Dans le cas ou le chevauchement est à la fin
+        if (
+          region.start > r.start &&
+          region.start < r.end &&
+          region.end > r.end
+        ) {
+          overlapsType = OverlapType.START_RIGHT;
+
+          return;
+        }
+
+        // Dans le cas ou le chevauchement enveloppe
+        if (region.start < r.start && region.end > r.end) {
+          overlapsType = OverlapType.ENCLOSES;
+
+          return;
+        }
+      });
+    }
+
+    return overlapsType;
   }
 
   onZoomIn(): void {

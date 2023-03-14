@@ -9,6 +9,11 @@ export const loadRegionsSuccess = createAction(
   props<{ data: any }>()
 );
 
+export const setRegions = createAction(
+  '[Region] Set Regions',
+  props<{ regions: RegionEntity[] }>()
+);
+
 export const addRegion = createAction(
   '[Region] Add Region',
   props<{ region: RegionEntity }>()
@@ -16,5 +21,5 @@ export const addRegion = createAction(
 
 export const updateRegion = createAction(
   '[Region] Update Region',
-  props<{ region: RegionEntity }>()
+  props<{ region: RegionEntity; regionsId: string[] }>()
 );

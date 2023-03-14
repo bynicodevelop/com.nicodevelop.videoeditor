@@ -6,14 +6,17 @@ import { RegionEntity } from 'src/app/models/region';
 import { Actions } from '@ngrx/effects';
 import { provideMockActions } from '@ngrx/effects/testing';
 
-import { addCuts, convertRegion } from './cuts.actions';
+import {
+  addCuts,
+  convertRegion,
+} from './cuts.actions';
 import { CutsEffects } from './cuts.effects';
 
-describe('CutsEffects', () => {
+describe('CutsEffects', (): void => {
   let actions$: Observable<any>;
   let effects: CutsEffects;
 
-  beforeEach(() => {
+  beforeEach((): void => {
     const actionsMock = jasmine.createSpyObj('Actions', ['pipe']);
     TestBed.configureTestingModule({
       providers: [
@@ -26,11 +29,11 @@ describe('CutsEffects', () => {
     effects = TestBed.inject(CutsEffects);
   });
 
-  it('should be created', () => {
+  it('should be created', (): void => {
     expect(effects).toBeTruthy();
   });
 
-  it('Should return empty array of cuts (1)', () => {
+  it('Should return empty array of cuts (1)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -42,13 +45,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [
@@ -60,7 +61,7 @@ describe('CutsEffects', () => {
     });
   });
 
-  it('Should return empty array of cuts (2)', () => {
+  it('Should return empty array of cuts (2)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -72,13 +73,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [{ uid: 'cut-1', start: 3, end: 10 }],
@@ -87,7 +86,7 @@ describe('CutsEffects', () => {
     });
   });
 
-  it('Should return empty array of cuts (3)', () => {
+  it('Should return empty array of cuts (3)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -99,13 +98,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [{ uid: 'cut-1', start: 0, end: 8 }],
@@ -114,7 +111,7 @@ describe('CutsEffects', () => {
     });
   });
 
-  it('Should return empty array of cuts (4)', () => {
+  it('Should return empty array of cuts (4)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -132,13 +129,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [
@@ -151,7 +146,7 @@ describe('CutsEffects', () => {
     });
   });
 
-  it('Should return empty array of cuts (5)', () => {
+  it('Should return empty array of cuts (5)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -175,13 +170,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [
@@ -195,7 +188,7 @@ describe('CutsEffects', () => {
     });
   });
 
-  it('Should return empty array of cuts (6)', () => {
+  it('Should return empty array of cuts (6)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -219,13 +212,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [
@@ -239,7 +230,7 @@ describe('CutsEffects', () => {
     });
   });
 
-  it('Should return empty array of cuts (7)', () => {
+  it('Should return empty array of cuts (7)', (): void => {
     const regions = [
       {
         uid: 'region-1',
@@ -251,13 +242,11 @@ describe('CutsEffects', () => {
 
     const duration = 10;
 
-    actions$ = new Observable((observer) => {
+    actions$ = new Observable((observer): void => {
       observer.next(convertRegion({ regions, duration }));
     });
 
-    effects.addRegion$.subscribe((action) => {
-      console.log(action);
-
+    effects.addRegion$.subscribe((action): void => {
       expect(action).toEqual(
         addCuts({
           cuts: [{ uid: 'cut-1', start: 3, end: 10 }],

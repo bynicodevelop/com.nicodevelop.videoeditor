@@ -27,7 +27,7 @@ export class RegionFacade {
     this.store.dispatch(addRegion({ region }));
   }
 
-  updateRegion(region: RegionEntity): void {
-    this.store.dispatch(updateRegion({ region }));
+  updateRegion(region: RegionEntity, regionsId: string[]): void {
+    this.store.dispatch(updateRegion({ region, regionsId }));
   }
 }
