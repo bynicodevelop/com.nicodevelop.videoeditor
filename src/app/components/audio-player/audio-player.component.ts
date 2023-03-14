@@ -207,6 +207,10 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
         this.wavesurfer.seekTo(region.end / this.wavesurfer.getDuration());
       }
     });
+
+    this.wavesurfer?.on('interaction', (region): void => {
+      console.log(region);
+    });
   }
 
   onZoomIn(): void {
