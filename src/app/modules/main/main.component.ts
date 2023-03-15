@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+} from '@angular/core';
 
 import { Observable } from 'rxjs';
 import { VideoEntity } from 'src/app/models/video';
@@ -27,6 +31,11 @@ export class MainComponent implements OnInit {
     private videoFacade: VideoFacade,
     private playerFacade: PlayerFacade
   ) {}
+
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnloadHander(): boolean {
+    return !this.currentVideo ? true : false;
+  }
 
   ngOnInit(): void {
     this.isPlaying$.subscribe((isPlaying): void => {
