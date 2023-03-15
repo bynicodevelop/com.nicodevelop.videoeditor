@@ -7,19 +7,27 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { BehaviorSubject, debounceTime, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  Observable,
+} from 'rxjs';
+import { OverlapType } from 'src/app/enums/overlay-type';
 import { RegionEntity } from 'src/app/models/region';
 import { VideoEntity } from 'src/app/models/video';
+import { RegionService } from 'src/app/services/region.service';
 import { CutsFacade } from 'src/app/stores/cuts/cuts.facade.service';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { RegionFacade } from 'src/app/stores/regions/region.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
+import { environment } from 'src/environments/environment';
 import WaveSurfer from 'wavesurfer.js';
-import RegionsPlugin from 'wavesurfer.js/src/plugin/regions';
+import RegionsPlugin, { Region } from 'wavesurfer.js/src/plugin/regions';
 
 import {
   faMagnifyingGlassMinus,
   faMagnifyingGlassPlus,
+  faTrash,
   faWaveSquare,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -31,16 +39,18 @@ import {
 export class AudioPlayerComponent implements OnInit, AfterViewInit {
   @ViewChild('player') player!: ElementRef<HTMLDivElement>;
 
-  @Input() videos!: VideoEntity[] | null;
+  @Input() videos: VideoEntity[] | null = null;
 
   @Input() isReady$: Observable<boolean> = new Observable<boolean>();
 
   isPlaying$ = this.playerFacade.isPlaying();
+  canRemove$ = this.regionFacade.hasSelectedRegions();
   seek$ = this.playerFacade.getSeek();
 
   faMagnifyingGlassMinus = faMagnifyingGlassMinus;
   faMagnifyingGlassPlus = faMagnifyingGlassPlus;
   faWaveform = faWaveSquare;
+  faTrash = faTrash;
 
   regions$ = this.regionFacade.getRegions();
 
@@ -59,7 +69,8 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     private regionFacade: RegionFacade,
     private playerFacade: PlayerFacade,
     private videoFacade: VideoFacade,
-    private cutsFacade: CutsFacade
+    private cutsFacade: CutsFacade,
+    private regionService: RegionService
   ) {}
 
   ngOnInit(): void {
@@ -77,9 +88,9 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     });
 
     this.regions$.subscribe((regions): void => {
-      if (regions.length === 0) return;
+      if (!this.videos || this.videos.length === 0) return;
 
-      this.cutsFacade.addRegions(regions, this.videos?.[0].duration || 0);
+      this.cutsFacade.addRegions(regions, this.videos[0].duration || 0);
     });
 
     this.isPlaying$.subscribe((isPlaying): void => {
@@ -93,7 +104,12 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     this.regionUpdated$.pipe(debounceTime(500)).subscribe((region): void => {
       if (!region) return;
 
-      this.regionFacade.updateRegion(region);
+      this.regionFacade.updateRegion(
+        region,
+        Object.values(this.wavesurfer?.regions.list || []).map(
+          (region: Region): string => region.id
+        )
+      );
     });
   }
 
@@ -120,24 +136,58 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     });
 
     this.wavesurfer?.on('region-created', (region): void => {
-      this.regionFacade.getRegion(region.id).subscribe((current): void => {
-        if (current) return;
+      this.regionFacade
+        .getRegion(region.id)
+        .subscribe((current): void => {
+          if (current) return;
 
-        this.regionFacade.addRegion({
-          uid: region.id,
-          start: region.start,
-          end: region.end,
-          duration: region.end - region.start,
-        });
-      });
+          this.regionFacade.addRegion({
+            uid: region.id,
+            start: region.start,
+            end: region.end,
+            duration: region.end - region.start,
+          });
+        })
+        .unsubscribe();
     });
 
-    this.wavesurfer?.on('region-updated', (region): void => {
+    this.wavesurfer?.on('region-updated', (region: Region): void => {
+      const overlaps = this.regionService.getOverlap(
+        region,
+        Object.values(this.wavesurfer?.regions.list || [])
+      );
+
+      const overlapsType = this.regionService.getOverlayType(region, overlaps);
+
+      if (overlapsType === OverlapType.START_LEFT) {
+        region.update({
+          end: overlaps[0].start,
+        });
+      }
+
+      if (overlapsType === OverlapType.ENCLOSES) {
+        overlaps[0].remove();
+      }
+
+      if (overlapsType === OverlapType.START_RIGHT) {
+        region.update({
+          start: overlaps[0].end,
+        });
+      }
+
+      if (
+        Number(region.end.toFixed(1)) - Number(region.start.toFixed(1)) <
+        environment.minimumDuration
+      ) {
+        region.remove();
+      }
+
       this.regionUpdated$.next({
         uid: region.id,
         start: region.start,
         end: region.end,
         duration: region.end - region.start,
+        selected: (region.attributes['class'] || '').includes('selected'),
       });
     });
 
@@ -161,6 +211,13 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
         this.wavesurfer.seekTo(region.end / this.wavesurfer.getDuration());
       }
     });
+
+    this.wavesurfer?.on('region-click', (region: Region): void => {
+      this.regionService.toggleSelectRegion(
+        region,
+        Object.values(this.wavesurfer?.regions.list || [])
+      );
+    });
   }
 
   onZoomIn(): void {
@@ -173,5 +230,15 @@ export class AudioPlayerComponent implements OnInit, AfterViewInit {
     if (this.levelZoom$.value <= this.levelZoomMin) return;
 
     this.levelZoom$.next(this.levelZoom$.value - 10);
+  }
+
+  onRemove(): void {
+    const regionId = this.regionService.removeSelectedRegions(
+      Object.values(this.wavesurfer?.regions.list || [])
+    );
+
+    if (!regionId) return;
+
+    this.regionFacade.removeRegion(regionId);
   }
 }

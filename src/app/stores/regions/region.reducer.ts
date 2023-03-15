@@ -1,9 +1,20 @@
 import { RegionEntity } from 'src/app/models/region';
 
-import { createEntityAdapter, EntityState } from '@ngrx/entity';
-import { createReducer, on } from '@ngrx/store';
+import {
+  createEntityAdapter,
+  EntityState,
+} from '@ngrx/entity';
+import {
+  createReducer,
+  on,
+} from '@ngrx/store';
 
-import { addRegion, updateRegion } from './region.actions';
+import {
+  addRegion,
+  removeRegionByUid,
+  setRegions,
+  updateRegion,
+} from './region.actions';
 
 export const regionFeatureKey = 'region';
 
@@ -18,6 +29,10 @@ export const initialState: State = regionAdapter.getInitialState();
 export const regionReducer = createReducer(
   initialState,
   on(
+    setRegions,
+    (state, { regions }): State => regionAdapter.setAll(regions, state)
+  ),
+  on(
     addRegion,
     (state, { region }): State => regionAdapter.addOne(region, state)
   ),
@@ -31,5 +46,9 @@ export const regionReducer = createReducer(
         },
         state
       )
+  ),
+  on(
+    removeRegionByUid,
+    (state, { uid }): State => regionAdapter.removeOne(uid, state)
   )
 );

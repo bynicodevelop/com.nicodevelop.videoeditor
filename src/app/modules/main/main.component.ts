@@ -1,6 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+} from '@angular/core';
 
-import { Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+} from 'rxjs';
 import { VideoEntity } from 'src/app/models/video';
 import { PlayerFacade } from 'src/app/stores/player/player.facade.service';
 import { VideoFacade } from 'src/app/stores/videos/video.facade.service';
@@ -17,8 +24,10 @@ export class MainComponent implements OnInit {
 
   isReady$: Observable<boolean> = this.videoFacade.videoLoaded();
   isPlaying$: Observable<boolean> = this.playerFacade.isPlaying();
+  isUploading$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   isPlaying = false;
+
   currentVideo?: VideoEntity;
 
   faDownload = faDownload;
@@ -28,7 +37,18 @@ export class MainComponent implements OnInit {
     private playerFacade: PlayerFacade
   ) {}
 
+  @HostListener('window:beforeunload', ['$event'])
+  beforeUnloadHander(): boolean {
+    return !this.currentVideo ? true : false;
+  }
+
   ngOnInit(): void {
+    this.isReady$.subscribe((isReady): void => {
+      if (isReady) {
+        this.isUploading$.next(false);
+      }
+    });
+
     this.isPlaying$.subscribe((isPlaying): void => {
       this.isPlaying = isPlaying;
     });
@@ -41,6 +61,8 @@ export class MainComponent implements OnInit {
   }
 
   onUploadFile(files: File[]): void {
+    this.isUploading$.next(true);
+
     this.videoFacade.uploadVideos(files);
   }
 
